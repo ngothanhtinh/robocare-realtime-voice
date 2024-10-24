@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Microphone to Speaker</title>
+        <title>Robocare controller</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <style>
             body {
@@ -13,214 +13,44 @@
                 align-items: center;
                 height: 100vh;
                 margin: 0;
-                background-color: #f0f0f0;
+                background-color: #ffffff;
             }
         </style>
     </head>
     <body>
         <div class="container">
-
-            <div class="row">
-                <button type="button" class="btn btn-success" id="toggleAudio">Start Audio</button>
-                
-            </div>
-           <div class="row">
-                <div class="mt-3">
-                    <input class="form-control" type="file" id="audioFile" accept=".wav, .mp3">
+            <div class="h1 text-center fw-bold mb-5">ROBOCARE CONTROLLER</div>
+            <div class="row mt-3">
+                <div class="card">
+                    <h5 class="card-header">Scene 1</h5>
+                    <div class="card-body">
+                        <p class="fs-5 mb-3 fst-italic">
+                            "Greetings, everyone. I am RoboCareer. I am programmed to answer all inquiries about future careers in the age of artificial intelligence. Please ask your questions."
+                        </p>
+                        <div class="row">
+                            <div class="col-2">
+                                <video id="audioWaveIcon" width="127" height="127" preload="none" style="display: none;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+                                    <source src="https://cdnl.iconscout.com/lottie/premium/preview-watermark/audio-wave-animated-icon-download-in-lottie-json-gif-static-svg-file-formats--graph-music-playing-sound-pack-user-interface-icons-9145809.mp4" type="video/mp4">
+                                </video>
+                                <button type="button" class="btn btn-primary" id="playButton">Play Answer</button>
+                            </div>
+                            <div class="col-10"></div>
+                        </div>
+                    </div>
                 </div>
-                <button type="button" class="btn btn-primary" id="playButton">Play Audio</button>
+                <audio id="answerPlayer" src="https://pouch.jumpshare.com/download/IqmBI49iYjnq3wcKf8u7Dviw-ATPeIoU4DMhfrGGUs5-3zrHmmtfsp5KSm5CI1ABzg5B7MfbFpkPzZ7zip5ZCA" preload="auto"></audio>
            </div>
+
+            <div class="row mt-5">
+                <video id="liveConversationIcon" width="180" height="180" preload="none" style="background: transparent; display: none;" autoplay="autoplay" loop="true" muted="muted" playsinline="">
+                    <source src="https://cdn-icons-mp4.flaticon.com/512/11919/11919388.mp4" type="video/mp4">
+                </video>
+                <button type="button" class="btn btn-success" id="toggleAudio">Start Live Conversation</button>
+            </div>
 
         </div>
         
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script>
-
-            let audioRecorder = null;
-
-            // Create audio context
-            const BUFFER_SIZE = 4800;
-            class Player {
-                constructor() {
-                    this.playbackNode = null;
-                }
-
-                async init(sampleRate) {
-                    const audioContext = new AudioContext({ sampleRate });
-                    await audioContext.audioWorklet.addModule("/audio-playback-worklet.js");
-
-                    this.playbackNode = new AudioWorkletNode(audioContext, "audio-playback-worklet");
-                    this.playbackNode.connect(audioContext.destination);
-                }
-
-                play(buffer) {
-                    if (this.playbackNode) {
-                        this.playbackNode.port.postMessage(buffer);
-                    }
-                }
-
-                stop() {
-                    if (this.playbackNode) {
-                        this.playbackNode.port.postMessage(null);
-                    }
-                }
-            }   
-
-            class Recorder {
-                constructor(onDataAvailable) {
-                    this.onDataAvailable = onDataAvailable;
-                    this.audioContext = null;
-                    this.mediaStream = null;
-                    this.mediaStreamSource = null;
-                    this.workletNode = null;
-                }
-
-                async start(stream) {
-                    console.log('starting')
-                    try {
-                        if (this.audioContext) {
-                            await this.audioContext.close();
-                        }
-
-                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 24000 });
-                        console.log('1')
-
-                        await this.audioContext.audioWorklet.addModule("/audio-processor-worklet.js");
-                        console.log('2')
-
-                        this.mediaStream = stream;
-                        this.mediaStreamSource = this.audioContext.createMediaStreamSource(this.mediaStream);
-
-                        this.workletNode = new AudioWorkletNode(this.audioContext, "audio-processor-worklet");
-                        this.workletNode.port.onmessage = event => {
-                            this.onDataAvailable(event.data.buffer);
-                        };
-
-                        this.mediaStreamSource.connect(this.workletNode);
-                        this.workletNode.connect(this.audioContext.destination);
-                        console.log('done')
-                    } catch (error) {
-                        console.log('error', error)
-                        this.stop();
-                    }
-                }
-
-                async stop() {
-                    if (this.mediaStream) {
-                        this.mediaStream.getTracks().forEach(track => track.stop());
-                        this.mediaStream = null;
-                    }
-
-                    if (this.audioContext) {
-                        await this.audioContext.close();
-                        this.audioContext = null;
-                    }
-
-                    this.mediaStreamSource = null;
-                    this.workletNode = null;
-                }
-            }
-
-
-            // Function to get microphone input and send it to WebSocket
-            async function startAudio() {
-                try {
-
-                    // handle output -> speaker stuff
-                    ws = new WebSocket("ws://localhost:3000/ws");
-
-                    const audioPlayer = new Player();
-                    audioPlayer.init(24000);
-
-                    ws.onmessage = event => {
-
-                        const data = JSON.parse(event.data);
-                        if (data?.type !== 'response.audio.delta') return;
-
-                        const binary = atob(data.delta);
-                        const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-                        const pcmData = new Int16Array(bytes.buffer);
-
-                        audioPlayer.play(pcmData);
-                    };
-
-                    let buffer = new Uint8Array();
-
-                    const appendToBuffer = (newData) => {
-                        const newBuffer = new Uint8Array(buffer.length + newData.length);
-                        newBuffer.set(buffer);
-                        newBuffer.set(newData, buffer.length);
-                        buffer = newBuffer;
-                    };
-
-                    const handleAudioData = (data) => {
-                        const uint8Array = new Uint8Array(data);
-                        appendToBuffer(uint8Array);
-
-                        if (buffer.length >= BUFFER_SIZE) {
-                            const toSend = new Uint8Array(buffer.slice(0, BUFFER_SIZE));
-                            buffer = new Uint8Array(buffer.slice(BUFFER_SIZE));
-
-                            const regularArray = String.fromCharCode(...toSend);
-                            const base64 = btoa(regularArray);
-
-                            ws.send(JSON.stringify({type: 'input_audio_buffer.append', audio: base64}));
-                        }
-                    };
-
-                    // handle microphone -> input websocket
-                    audioRecorder = new Recorder(handleAudioData);
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-                    await audioRecorder.start(stream);
-                    
-
-                } catch (error) {
-                    console.error('Error accessing the microphone', error);
-                    alert('Error accessing the microphone. Please check your settings and try again.');
-                }
-            }
-
-            // Function to stop audio recording and close WebSocket
-            function stopAudio() {
-                if (audioRecorder) {
-                    audioRecorder.stop();  // Stop the recorder
-                }
-            }
-
-            // Button to toggle audio
-            const toggleButton = document.getElementById('toggleAudio');
-            let isAudioOn = false;
-
-            toggleButton.addEventListener('click', async () => {
-                if (!isAudioOn) {
-                    await startAudio();
-                    toggleButton.textContent = 'Stop Audio';
-                    isAudioOn = true;
-                    console.log('Audio ON');
-                } else {
-                    stopAudio();
-                    toggleButton.textContent = 'Start Audio';
-                    isAudioOn = false;
-                    console.log('Audio OFF');
-                }
-            });
-
-            const playButton = document.getElementById('playButton');
-            const audioFileInput = document.getElementById('audioFile');
-            let audioPlayer;
-
-            playButton.addEventListener('click', function() {
-                const file = audioFileInput.files[0];
-                if (file) {
-                    const audioUrl = URL.createObjectURL(file); // Create a URL for the file
-                    audioPlayer = new Audio(audioUrl); // Create a new audio object
-                    audioPlayer.play(); // Play the audio
-                } else {
-                    alert('Please select an audio file first.');
-                }
-            });
-
-        </script>
+        <script src="script.js"></script>
     </body>
 </html>
