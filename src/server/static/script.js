@@ -169,25 +169,67 @@ toggleButton.addEventListener('click', async () => {
     }
 });
 
-const playButton = document.getElementById('playButton');
-const audioWaveIcon = document.getElementById('audioWaveIcon');
-const answerPlayer = document.getElementById('answerPlayer');
+// const playButton1 = document.getElementById('playButton_1');
+// const audioWaveIcon1 = document.getElementById('audioWaveIcon_1');
+// const answerPlayer1 = document.getElementById('answerPlayer_1');
 
-playButton.addEventListener('click', function() {
-    answerPlayer.play();
-});
+// playButton1.addEventListener('click', function() {
+//     answerPlayer1.play();
+// });
 
-answerPlayer.addEventListener('play', function() {
-    // Show audio wave icon when audio is playing
-    audioWaveIcon.style.display = 'block';
-});
+// answerPlayer1.addEventListener('play', function() {
+//     audioWaveIcon1.style.display = 'block';
+// });
 
-answerPlayer.addEventListener('ended', function() {
-    // Hide audio wave icon when audio finishes playing
-    audioWaveIcon.style.display = 'none';
-  });
+// answerPlayer1.addEventListener('ended', function() {
+//     audioWaveIcon1.style.display = 'none';
+//   });
 
-answerPlayer.addEventListener('pause', function() {
-    // Optionally, hide the icon if the audio is paused
-    audioWaveIcon.style.display = 'none';
-});
+//   answerPlayer1.addEventListener('pause', function() {
+//     audioWaveIcon1.style.display = 'none';
+// });
+
+function setupAudioPlayer(buttonId, iconId, playerId) {
+    const playButton = document.getElementById(buttonId);
+    const audioWaveIcon = document.getElementById(iconId);
+    const answerPlayer = document.getElementById(playerId);
+
+    playButton.addEventListener('click', function() {
+        // Pause any currently playing audio
+        const allPlayers = document.querySelectorAll('[id^="answerPlayer"]');
+        allPlayers.forEach(player => {
+            if (!player.paused) {
+                player.pause();
+                player.currentTime = 0; // reset the audio
+            }
+        });
+
+        // Play the clicked button's corresponding audio
+        answerPlayer.play();
+    });
+
+    answerPlayer.addEventListener('play', function() {
+        audioWaveIcon.style.display = 'block';
+    });
+
+    answerPlayer.addEventListener('ended', function() {
+        audioWaveIcon.style.display = 'none';
+    });
+
+    answerPlayer.addEventListener('pause', function() {
+        audioWaveIcon.style.display = 'none';
+    });
+}
+
+// Call the function for each button-player-icon set
+setupAudioPlayer('playButton_1', 'audioWaveIcon_1', 'answerPlayer_1');
+setupAudioPlayer('playButton_2', 'audioWaveIcon_2', 'answerPlayer_2');
+setupAudioPlayer('playButton_3', 'audioWaveIcon_3', 'answerPlayer_3');
+setupAudioPlayer('playButton_4', 'audioWaveIcon_4', 'answerPlayer_4');
+setupAudioPlayer('playButton_5', 'audioWaveIcon_5', 'answerPlayer_5');
+setupAudioPlayer('playButton_6', 'audioWaveIcon_6', 'answerPlayer_6');
+setupAudioPlayer('playButton_7', 'audioWaveIcon_7', 'answerPlayer_7');
+setupAudioPlayer('playButton_8', 'audioWaveIcon_8', 'answerPlayer_8');
+setupAudioPlayer('playButton_9', 'audioWaveIcon_9', 'answerPlayer_9');
+setupAudioPlayer('playButton_11', 'audioWaveIcon_11', 'answerPlayer_11');
+// Continue for the rest of the buttons and players
