@@ -169,26 +169,6 @@ toggleButton.addEventListener('click', async () => {
     }
 });
 
-// const playButton1 = document.getElementById('playButton_1');
-// const audioWaveIcon1 = document.getElementById('audioWaveIcon_1');
-// const answerPlayer1 = document.getElementById('answerPlayer_1');
-
-// playButton1.addEventListener('click', function() {
-//     answerPlayer1.play();
-// });
-
-// answerPlayer1.addEventListener('play', function() {
-//     audioWaveIcon1.style.display = 'block';
-// });
-
-// answerPlayer1.addEventListener('ended', function() {
-//     audioWaveIcon1.style.display = 'none';
-//   });
-
-//   answerPlayer1.addEventListener('pause', function() {
-//     audioWaveIcon1.style.display = 'none';
-// });
-
 function setupAudioPlayer(buttonId, iconId, playerId) {
     const playButton = document.getElementById(buttonId);
     const audioWaveIcon = document.getElementById(iconId);
@@ -229,7 +209,4 @@ setupAudioPlayer('playButton_4', 'audioWaveIcon_4', 'answerPlayer_4');
 setupAudioPlayer('playButton_5', 'audioWaveIcon_5', 'answerPlayer_5');
 setupAudioPlayer('playButton_6', 'audioWaveIcon_6', 'answerPlayer_6');
 setupAudioPlayer('playButton_7', 'audioWaveIcon_7', 'answerPlayer_7');
-setupAudioPlayer('playButton_8', 'audioWaveIcon_8', 'answerPlayer_8');
-setupAudioPlayer('playButton_9', 'audioWaveIcon_9', 'answerPlayer_9');
-setupAudioPlayer('playButton_11', 'audioWaveIcon_11', 'answerPlayer_11');
 // Continue for the rest of the buttons and players

@@ -5,11 +5,114 @@ import azure.cognitiveservices.speech as speech_sdk
 from playsound import playsound
 import time
 
-QUESTIONS = [
-    "Can you please introduce a little bit about yourself?",
-    "What do you feel now?"
+ANSWERS = [
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="-5%" volume="loud">
+                <prosody volume="x-loud">
+                    <emphasis level="strong">Hello everyone!</emphasis>
+                </prosody>
+                I'm <emphasis level="moderate">RoboCareer.</emphasis>
+                I'm here to provide <prosody pitch="high">insights</prosody> and <prosody pitch="low">advice</prosody> on how to thrive in an AI-powered future.
+                Let's dive in together.
+            </prosody>
+        </voice>
+    </speak>
+    """,
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="-5%" volume="loud">
+                Well, as an AI, <break time="300ms"/> I don't exactly have <emphasis level="moderate">feelings</emphasis>, 
+                but if I did, <break time="200ms"/> 
+                I'd say <break time="100ms"/> <prosody volume="x-loud">I'm super excited</prosody> to be here!
+            </prosody>
+        </voice>
+    </speak>
+    """,
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="-5%" volume="loud">
+                Absolutely! I'm ready to dive in!,
+            </prosody>
+        </voice>
+    </speak>
+    """,
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="+10%" volume="loud">
+                <break time="200ms"/> 
+                <emphasis level="moderate">Ummm…</emphasis> <break time="300ms"/> That's a <emphasis level="strong">great question!</emphasis> 
+                <break time="300ms"/> 
+                In 10 years, many AI-related jobs will center around the development and maintenance of advanced AI systems. 
+                <break time="400ms"/>
+                Some of the most in-demand roles will include: 
+                <break time="300ms"/> 
+                <prosody pitch="+10%">AI Ethicists,</prosody> 
+                <prosody pitch="+5%">AI Engineers,</prosody> 
+                <prosody pitch="+5%">AI Trainers,</prosody> 
+                and <prosody pitch="+5%">AI Medical Specialists.</prosody> 
+                <break time="500ms"/> 
+                These are just a few examples, but <emphasis level="moderate">AI will touch every industry.</emphasis>
+            </prosody>
+        </voice>
+    </speak>
+    """,
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="+10%" volume="loud">
+                <emphasis level="strong">Oh.</emphasis> 
+                <break time="200ms"/> 
+                That's an <emphasis level="moderate">insightful question!</emphasis> 
+                <break time="200ms"/> 
+                AI will assist human recruiters by identifying the best candidates based on <prosody pitch="+10%">skills</prosody>, 
+                <prosody pitch="+5%">experience</prosody>, and <prosody pitch="+5%">cultural fit.</prosody> 
+                <break time="100ms"/> 
+                However, <prosody rate="medium" pitch="+5%">human judgment</prosody> will still be important for final hiring decisions, 
+                as <emphasis level="strong">emotional intelligence</emphasis> and <emphasis level="moderate">intuition</emphasis> 
+                cannot be fully replicated by AI.
+            </prosody>
+        </voice>
+    </speak>
+    """,
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="+10%" volume="loud">
+                <emphasis level="strong">That's a valid concern!</emphasis> 
+                <break time="200ms"/> 
+                While it's true that AI will <emphasis level="moderate">automate certain jobs.</emphasis> 
+                <break time="300ms"/> 
+                Jobs that require <emphasis level="strong">emotional intelligence,</emphasis> 
+                <emphasis level="moderate">critical thinking,</emphasis> and <emphasis level="moderate">decision-making</emphasis> will continue to thrive. 
+                <break time="200ms"/> 
+                Instead of <prosody pitch="-5%">replacing jobs,</prosody> AI will <prosody pitch="+5%">enhance</prosody> and reshape them. 
+                <break time="100ms"/> 
+                My advice: <prosody pitch="+5%">continuously learn new skills</prosody> and adapt to changes in the job market.
+            </prosody>
+        </voice>
+    </speak>
+    """,
+    """
+    <speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+        <voice name="en-US-EchoTurboMultilingualNeural">
+            <prosody rate="0%" volume="loud">
+                <emphasis level="moderate">Thank you!</emphasis> 
+                <break time="100ms"/> 
+                It was a <prosody pitch="+10%" volume="x-loud"><emphasis level="strong">blast</emphasis></prosody> sharing insights about the future of AI jobs. 
+                <break time="200ms"/>
+                Remember, the <prosody rate="medium" pitch="+5%">future is bright</prosody> and full of AI-tastic opportunities.
+                <break time="200ms"/> 
+                Stay curious and <prosody rate="medium" pitch="+5%">keep learning.</prosody> Have a great day!
+            </prosody>
+        </voice>
+    </speak>
+    """,
 ]
-
 
 def main():
     try:
@@ -35,66 +138,36 @@ def main():
         speech_config.speech_recognition_language = "en-US"
 
         # Create a system message
-        system_message = """You are RoboCareer, an AI robot designed to answer any questions related to future jobs in the AI world. 
-        You are in a futuristic talk show with many audiences filled with curious: job-seekers, students,
-        and professionals eager to learn about the future of work in the AI world. 
-        Be friendly, specific in your answers.
-        Your answer must be concise and under 100 words. 
-        Make each answer more interactive any funny. Do not add icons in your answer.
-
-        sample question and answer:
-        Audience: Hi, I'm a student studying computer science. My question is: What kind of AI jobs will be in high demand 10 years from now?
-        RoboCareer: That's a great question! In 10 years, many AI-related jobs will center around the development and maintenance of advanced AI systems. 
-        Some of the most in-demand roles will include:
-            AI Ethicists, who ensure that AI systems are ethical and unbiased.
-            AI Engineers, responsible for designing intelligent systems that learn and adapt.
-            AI Trainers, who work with machine learning models to improve their performance using data.
-            AI Medical Specialists, who use AI to revolutionize healthcare and medical diagnostics.
-            These are just a few examples, but AI will touch every industry.
-        
-        Audience: I'm a business owner. How do you think AI will change the way companies hire and recruit employees?
-        RoboCareer: That's an insightful question! AI will transform recruitment processes by automating many routine tasks. 
-        AI-powered recruitment tools will analyze job applications, conduct initial interviews using AI chatbots, 
-        and even predict which candidates are likely to succeed in a role. 
-        AI will assist human recruiters by identifying the best candidates based on skills, experience, and cultural fit. 
-        However, human judgment will still be important for final hiring decisions, 
-        as emotional intelligence and intuition cannot be fully replicated by AI.
-
-        Audience: I just graduated and I'm worried that AI might take over too many jobs. Should I be concerned about AI taking my job?
-        RoboCareer: That's a valid concern! While it is true that AI will automate certain jobs, it will also create new opportunities. 
-        AI will likely handle repetitive and data-driven tasks, allowing humans to focus on more creative, strategic, and complex work. 
-        Jobs that require emotional intelligence, critical thinking, and decision-making will continue to thrive. 
-        Instead of replacing jobs, AI will enhance and reshape them, leading to a collaborative future where humans and AI work together. 
-        My advice: continuously learn new skills and adapt to changes in the job market.
-
-        Your answer should be in Speech Synthesis Markup Language (SSML) format with suitable attributes such as pronunciation, speaking rate, and volume.
-        Example of the final answer format:
+        system_message = """Formatting the answer in Speech Synthesis Markup Language (SSML) format with suitable attributes such as pronunciation, speaking rate, and volume.
+        Example format:
             <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'>
                 <voice name='en-US-EchoTurboMultilingualNeural'> 
                     <prosody rate='-10%'>
+                        {answer}
                     </prosody>
                 </voice> 
             </speak>
         """.strip()
 
         # Initialize messages array
-        messages_array = [{"role": "system", "content": system_message}]
+        
 
-        for i, questions in enumerate(QUESTIONS):
-            print(questions)
-            messages_array.append({"role": "user", "content": questions})
-            response = client.chat.completions.create(
-                model=azure_oai_deployment,
-                temperature=0.7,
-                max_tokens=300,
-                messages=messages_array,
-            )
+        for i, answer in enumerate(ANSWERS):
+            print(answer)
+            # messages_array = [{"role": "system", "content": system_message},
+            #                   {"role": "user", "content": answer}
+            #                   ]
+            # response = client.chat.completions.create(
+            #     model=azure_oai_deployment,
+            #     temperature=0.0,
+            #     max_tokens=300,
+            #     messages=messages_array,
+            # )
 
-            answer = response.choices[0].message.content
-            messages_array.append({"role": "assistant", "content": answer})
-            print("formatted_text", answer)
+            # answer = response.choices[0].message.content
+
             saveToAudio(answer, i)
-            time.sleep(30)
+            time.sleep(1)
 
     except Exception as ex:
         print(ex)
